@@ -1,3 +1,4 @@
 .gitignore
 *.log
 README.md
+app/node_modules
