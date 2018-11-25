@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  node:
+    container_name: nodejs_api
+    build: .
+    volumes:
+      - ./app:/app
+    ports:
+      - 8080:3333
