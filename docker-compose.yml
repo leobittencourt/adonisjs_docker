@@ -1,10 +1,47 @@
 version: '3'
 
 services:
-  node:
-    container_name: nodejs_api
+  postgresql:
+    container_name: database
+    build:
+      context: ./postgresql
+      args:
+        - POSTGRES_USER=leonardo
+        - POSTGRES_PASSWORD=123456789
+        - POSTGRES_DB=blog
+    volumes:
+      - ./data/postgresql/:/var/lib/postgresql
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+  nodejs:
+    container_name: api
     build: .
     volumes:
-      - ./app:/app
+      - ./blog:/blog
     ports:
       - 8080:3333
+    depends_on:
+      - postgresql
+    environment:
+      - DB_HOST=postgresql
+      - DB_PORT=5432
+      - DB_USER=leonardo
+      - DB_PASSWORD=123456789
+      - DB_DATABASE=blog
+    links:
+      - "postgresql:postgresql"
+    networks:
+      - backend
+  portainer:
+    image: portainer/portainer
+    ports:
+      - 9000:9000
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+networks:
+  backend:
+    driver: bridge
